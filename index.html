@@ -1,631 +1,217 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Judul halaman -->
-  <title>Jadwal Harian & To-Do List</title>
+<title>Jadwal Harian & To-Do List</title>
 
-  <!-- Verifikasi Google Search Console -->
-  <meta name="google-site-verification" content="MY4oBjjTwtfB_ijL9_euK2ZiDj3fTadDdoPH0yigpAg" />
+<meta name="description" content="Aplikasi To-Do List sederhana untuk mengatur jadwal harian dan tugas.">
+<meta name="author" content="Miracle Imanuel Saragih">
 
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Aplikasi To-Do List sederhana buatan Miracle untuk mengatur jadwal harian dan tugas dengan mudah.">
-  <meta name="keywords" content="to-do list, jadwal harian, aplikasi tugas, Miracle, GitHub Pages">
-  <meta name="author" content="MiraclemanuelSaragih">
+<meta property="og:title" content="To-Do List Miracle">
+<meta property="og:description" content="Atur jadwal harian dan tugas dengan mudah">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://miraclemanuelsaragih.github.io/to-do-list-noel-/">
 
-  <!-- Open Graph untuk preview di media sosial -->
-  <meta property="og:title" content="To-Do List Miracle">
-  <meta property="og:description" content="Atur jadwal harian dan tugas dengan aplikasi To-Do List sederhana.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://miraclemanuelsaragih.github.io/to-do-list-noel-/">
+<link rel="icon" href="favicon.ico">
 
-  <!-- Favicon -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <!-- CSS: pindahkan semua CSS kamu ke sini -->
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+body {
+  font-family: 'Inter','Segoe UI',sans-serif;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  min-height: 100vh;
+  padding: 20px;
+}
 
-    /* Tambahkan CSS lain kamu di sini */
-  </style>
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 2.4em;
+}
+
+.main-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 20px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.tab.active {
+  color: #667eea;
+  border-bottom: 3px solid #667eea;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input, select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  flex: 1;
+}
+
+.btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.task-item {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.task-item.completed {
+  opacity: .6;
+  text-decoration: line-through;
+}
+</style>
 </head>
+
 <body>
-  <h1>Selamat datang di To-Do List Miracle 🎉</h1>
-  <p>Website ini membantu kamu mengatur jadwal harian dan tugas dengan mudah.</p>
 
-  <!-- Tambahkan konten utama kamu di sini -->
-</body>
-</html>
+<div class="container">
 
+  <div class="header">
+    <h1>📅 Jadwal Harian & To-Do List</h1>
+    <p id="datetime"></p>
+  </div>
 
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  <div class="main-card">
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .date-time {
-            font-size: 1.2em;
-            opacity: 0.95;
-            margin-top: 10px;
-        }
-
-        .main-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .tab {
-            padding: 12px 25px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-size: 1.1em;
-            color: #666;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .tab:hover {
-            color: #667eea;
-        }
-
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"], input[type="time"], select, textarea {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .task-list {
-            margin-top: 20px;
-        }
-
-        .task-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
-            animation: slideIn 0.3s;
-        }
-
-        .task-item:hover {
-            background: #e8eaf6;
-            transform: translateX(5px);
-        }
-
-        .task-item.completed {
-            opacity: 0.6;
-            background: #e8f5e9;
-        }
-
-        .task-item.completed .task-text {
-            text-decoration: line-through;
-            color: #666;
-        }
-
-        .checkbox {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-
-        .task-content {
-            flex: 1;
-        }
-
-        .task-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .task-meta {
-            font-size: 0.9em;
-            color: #666;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .task-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .priority-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .priority-high { background: #ffebee; color: #c62828; }
-        .priority-medium { background: #fff3e0; color: #ef6c00; }
-        .priority-low { background: #e8f5e9; color: #2e7d32; }
-
-        .task-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2em;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-icon:hover {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .btn-delete:hover {
-            color: #f44336;
-        }
-
-        .btn-edit:hover {
-            color: #2196f3;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            border-radius: 15px;
-            color: white;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .empty-state-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            background: #f0f0f0;
-            border: 2px solid transparent;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9em;
-        }
-
-        .filter-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .task-meta {
-                flex-direction: column;
-                gap: 5px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📅 Jadwal Harian & To-Do List</h1>
-            <div class="date-time" id="datetime"></div>
-        </div>
-
-        <div class="main-card">
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalTasks">0</div>
-                    <div class="stat-label">Total Tugas</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                    <div class="stat-number" id="completedTasks">0</div>
-                    <div class="stat-label">Selesai</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);">
-                    <div class="stat-number" id="pendingTasks">0</div>
-                    <div class="stat-label">Belum Selesai</div>
-                </div>
-            </div>
-
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('todo')">✅ To-Do List</button>
-                <button class="tab" onclick="switchTab('schedule')">📋 Jadwal Harian</button>
-            </div>
-
-            <!-- Tab To-Do List -->
-            <div class="tab-content active" id="todo-tab">
-                <div class="input-group">
-                    <input type="text" id="todoInput" placeholder="Tambah tugas baru..." onkeypress="handleEnter(event, 'todo')">
-                    <select id="todoPriority">
-                        <option value="low">Prioritas Rendah</option>
-                        <option value="medium" selected>Prioritas Sedang</option>
-                        <option value="high">Prioritas Tinggi</option>
-                    </select>
-                    <button class="btn" onclick="addTodo()">+ Tambah</button>
-                </div>
-
-                <div class="filter-group">
-                    <button class="filter-btn active" onclick="filterTasks('all')">Semua</button>
-                    <button class="filter-btn" onclick="filterTasks('pending')">Belum Selesai</button>
-                    <button class="filter-btn" onclick="filterTasks('completed')">Selesai</button>
-                    <button class="filter-btn" onclick="filterTasks('high')">Prioritas Tinggi</button>
-                </div>
-
-                <div class="task-list" id="todoList"></div>
-            </div>
-
-            <!-- Tab Jadwal Harian -->
-            <div class="tab-content" id="schedule-tab">
-                <div class="input-group">
-                    <input type="time" id="scheduleTime">
-                    <input type="text" id="scheduleInput" placeholder="Kegiatan..." onkeypress="handleEnter(event, 'schedule')">
-                    <button class="btn" onclick="addSchedule()">+ Tambah</button>
-                </div>
-
-                <div class="task-list" id="scheduleList"></div>
-            </div>
-        </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(event,'todo')">To-Do</button>
+      <button class="tab" onclick="switchTab(event,'schedule')">Jadwal</button>
     </div>
 
-    <script>
-        let todos = JSON.parse(localStorage.getItem('todos')) || [];
-        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
-        let currentFilter = 'all';
+    <div id="todo-tab" class="tab-content active">
+      <div class="input-group">
+        <input id="todoInput" placeholder="Tugas baru">
+        <button class="btn" onclick="addTodo()">Tambah</button>
+      </div>
+      <div id="todoList"></div>
+    </div>
 
-        // Update date time
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            document.getElementById('datetime').textContent = now.toLocaleDateString('id-ID', options);
-        }
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
+    <div id="schedule-tab" class="tab-content">
+      <div class="input-group">
+        <input type="time" id="scheduleTime">
+        <input id="scheduleInput" placeholder="Kegiatan">
+        <button class="btn" onclick="addSchedule()">Tambah</button>
+      </div>
+      <div id="scheduleList"></div>
+    </div>
 
-        // Switch tabs
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById(tab + '-tab').classList.add('active');
-        }
+  </div>
+</div>
 
-        // Handle Enter key
-        function handleEnter(event, type) {
-            if (event.key === 'Enter') {
-                if (type === 'todo') addTodo();
-                else addSchedule();
-            }
-        }
+<script>
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
+let schedules = JSON.parse(localStorage.getItem("schedules")) || [];
 
-        // Add To-Do
-        function addTodo() {
-            const input = document.getElementById('todoInput');
-            const priority = document.getElementById('todoPriority').value;
-            const task = input.value.trim();
-            
-            if (task) {
-                todos.push({
-                    id: Date.now(),
-                    text: task,
-                    priority: priority,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
-                input.value = '';
-                saveTodos();
-                renderTodos();
-            }
-        }
+function updateDateTime() {
+  document.getElementById("datetime").textContent =
+    new Date().toLocaleString("id-ID");
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
 
-        // Add Schedule
-        function addSchedule() {
-            const timeInput = document.getElementById('scheduleTime');
-            const textInput = document.getElementById('scheduleInput');
-            const time = timeInput.value;
-            const text = textInput.value.trim();
-            
-            if (time && text) {
-                schedules.push({
-                    id: Date.now(),
-                    time: time,
-                    text: text,
-                    completed: false
-                });
-                timeInput.value = '';
-                textInput.value = '';
-                saveSchedules();
-                renderSchedules();
-            }
-        }
+function switchTab(e, tab) {
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+  e.target.classList.add("active");
+  document.getElementById(tab+"-tab").classList.add("active");
+}
 
-        // Toggle task completion
-        function toggleTodo(id) {
-            const todo = todos.find(t => t.id === id);
-            if (todo) {
-                todo.completed = !todo.completed;
-                saveTodos();
-                renderTodos();
-            }
-        }
+function addTodo() {
+  const text = todoInput.value.trim();
+  if(!text) return;
+  todos.push({id:Date.now(),text,completed:false});
+  todoInput.value="";
+  save();
+  render();
+}
 
-        function toggleSchedule(id) {
-            const schedule = schedules.find(s => s.id === id);
-            if (schedule) {
-                schedule.completed = !schedule.completed;
-                saveSchedules();
-                renderSchedules();
-            }
-        }
+function addSchedule() {
+  if(!scheduleTime.value || !scheduleInput.value) return;
+  schedules.push({id:Date.now(),time:scheduleTime.value,text:scheduleInput.value,completed:false});
+  scheduleInput.value="";
+  save();
+  render();
+}
 
-        // Delete task
-        function deleteTodo(id) {
-            if (confirm('Hapus tugas ini?')) {
-                todos = todos.filter(t => t.id !== id);
-                saveTodos();
-                renderTodos();
-            }
-        }
+function render() {
+  todoList.innerHTML = todos.map(t=>`
+    <div class="task-item ${t.completed?'completed':''}">
+      <input type="checkbox" ${t.completed?'checked':''} onclick="toggleTodo(${t.id})">
+      ${t.text}
+    </div>`).join("");
 
-        function deleteSchedule(id) {
-            if (confirm('Hapus jadwal ini?')) {
-                schedules = schedules.filter(s => s.id !== id);
-                saveSchedules();
-                renderSchedules();
-            }
-        }
+  scheduleList.innerHTML = schedules.map(s=>`
+    <div class="task-item ${s.completed?'completed':''}">
+      <input type="checkbox" ${s.completed?'checked':''} onclick="toggleSchedule(${s.id})">
+      ${s.time} - ${s.text}
+    </div>`).join("");
+}
 
-        // Filter tasks
-        function filterTasks(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderTodos();
-        }
+function toggleTodo(id){todos.find(t=>t.id===id).completed^=1;save();render();}
+function toggleSchedule(id){schedules.find(s=>s.id===id).completed^=1;save();render();}
+function save(){
+  localStorage.setItem("todos",JSON.stringify(todos));
+  localStorage.setItem("schedules",JSON.stringify(schedules));
+}
 
-        // Render To-Dos
-        function renderTodos() {
-            const list = document.getElementById('todoList');
-            let filteredTodos = todos;
+render();
+</script>
 
-            if (currentFilter === 'pending') filteredTodos = todos.filter(t => !t.completed);
-            else if (currentFilter === 'completed') filteredTodos = todos.filter(t => t.completed);
-            else if (currentFilter === 'high') filteredTodos = todos.filter(t => t.priority === 'high');
-
-            if (filteredTodos.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><p>Belum ada tugas</p></div>';
-            } else {
-                list.innerHTML = filteredTodos.map(todo => `
-                    <div class="task-item ${todo.completed ? 'completed' : ''}">
-                        <input type="checkbox" class="checkbox" ${todo.completed ? 'checked' : ''} 
-                               onchange="toggleTodo(${todo.id})">
-                        <div class="task-content">
-                            <div class="task-title">${todo.text}</div>
-                            <div class="task-meta">
-                                <span class="priority-badge priority-${todo.priority}">
-                                    ${todo.priority === 'high' ? '🔴 Tinggi' : 
-                                      todo.priority === 'medium' ? '🟡 Sedang' : '🟢 Rendah'}
-                                </span>
-                                <span>📅 ${new Date(todo.createdAt).toLocaleDateString('id-ID')}</span>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn-icon btn-delete" onclick="deleteTodo(${todo.id})">🗑️</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            updateStats();
-        }
-
-        // Render Schedules
-        function renderSchedules() {
-            const list = document.getElementById('scheduleList');
-            const sorted = [...schedules].sort((a, b) => a.time.localeCompare(b.time));
-            
-            if (sorted.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🕐</div><p>Belum ada jadwal</p></div>';
-            } else {
-                list.innerHTML = sorted.map(schedule => `
-                    <div class="task-item ${schedule.completed ? 'completed' : ''}">
-                        <input type="checkbox" class="checkbox" ${schedule.completed ? 'checked' : ''} 
-                               onchange="toggleSchedule(${schedule.id})">
-                        <div class="task-content">
-                            <div class="task-title">${schedule.text}</div>
-                            <div class="task-meta">
-                                <span>🕐 ${schedule.time}</span>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn-icon btn-delete" onclick="deleteSchedule(${schedule.id})">🗑️</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            updateStats();
-        }
-
-        // Update statistics
-        function updateStats() {
-            const allTasks = [...todos, ...schedules];
-            const completed = allTasks.filter(t => t.completed).length;
-            const pending = allTasks.length - completed;
-            
-            document.getElementById('totalTasks').textContent = allTasks.length;
-            document.getElementById('completedTasks').textContent = completed;
-            document.getElementById('pendingTasks').textContent = pending;
-        }
-
-        // Save to localStorage
-        function saveTodos() {
-            localStorage.setItem('todos', JSON.stringify(todos));
-        }
-
-        function saveSchedules() {
-            localStorage.setItem('schedules', JSON.stringify(schedules));
-        }
-
-        // Initial render
-        renderTodos();
-        renderSchedules();
-    </script>
 </body>
 </html>
