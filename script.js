@@ -1,4 +1,4 @@
-// 🔹 Inisialisasi Firebase (urutan diperbaiki)
+// Firebase versi 8.x (non-modular)
 const firebaseConfig = {
   apiKey: "AIzaSyAcnTpDBXO2WpXs3ri21SXJfzUMC_xkCkU",
   authDomain: "premium-todo-list.firebaseapp.com",
@@ -8,11 +8,10 @@ const firebaseConfig = {
   appId: "1:630693485104:web:820a99e6af935a7345abf5"
 };
 
-// ✅ Inisialisasi dulu sebelum pakai firestore
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 🔹 Fungsi To-Do List
+// 🔹 To-Do List
 function addTask() {
   const text = document.getElementById("taskText").value.trim();
   const time = document.getElementById("taskTime").value;
@@ -60,7 +59,7 @@ db.collection("tasks").orderBy("timestamp", "desc").onSnapshot(snapshot => {
   });
 });
 
-// 🔹 Fungsi Jadwal Harian
+// 🔹 Jadwal Harian
 function addSchedule() {
   const text = document.getElementById("scheduleText").value.trim();
   const time = document.getElementById("scheduleTime").value;
