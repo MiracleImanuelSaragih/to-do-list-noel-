@@ -1,201 +1,100 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium To-Do List - Miracle</title>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium To-Do List - Miracle</title>
 
-<style>
-/* ... CSS kamu tetap sama ... */
-</style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+  <style>
+    body {
+      font-family: Segoe UI, Arial;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .card {
+      background: white;
+      color: black;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    input, select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      cursor: pointer;
+    }
+    .task {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .task.completed {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+  </style>
 </head>
-
 <body>
-<audio id="alarmSound">
-  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">
-</audio>
-
-<div class="container">
-  <div class="header">
+  <div class="container">
     <h2>🚀 Premium To-Do List</h2>
-    <div>
-      <button class="icon-btn" onclick="toggleDark()">🌙</button>
-      <button class="icon-btn" onclick="requestNotif()">🔔</button>
-    </div>
-  </div>
 
-  <div id="countdown"></div>
-
-  <div class="main-card">
-
-    <div class="input-row">
-      <input id="taskText" placeholder="Tugas...">
-      <select id="taskPriority">
-        <option value="low">🟢 Low</option>
-        <option value="medium">🟡 Medium</option>
-        <option value="high">🔴 High</option>
-      </select>
-      <select id="taskReminder">
-        <option value="0">No Reminder</option>
-        <option value="5">5 menit</option>
-        <option value="15" selected>15 menit</option>
-        <option value="30">30 menit</option>
-      </select>
-      <button class="btn" onclick="addTask()">Tambah</button>
-    </div>
-
-    <input type="datetime-local" id="taskTime">
-
-    <div id="taskList"></div>
-  </div>
-</div>
-
-<script>
-// 🔹 Inisialisasi Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAcnTpDBXO2WpXs3ri21SXJfzUMC_xkCkU",
-  authDomain: "premium-todo-list.firebaseapp.com",
-  projectId: "premium-todo-list",
-  storageBucket: "premium-todo-list.appspot.com",
-  messagingSenderId: "630693485104",
-  appId: "1:630693485104:web:820a99e6af935a7345abf5"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-let alarmTimer;
-
-function toggleDark(){
-  document.body.classList.toggle("dark-mode");
-}
-
-function playSound(){
-  const s=document.getElementById("alarmSound");
-  s.currentTime=0;
-  s.play().catch(()=>{});
-}
-
-function requestNotif(){
-  if("Notification"in window){
-    Notification.requestPermission();
-  }
-}
-
-function notify(title,body){
-  if(Notification.permission==="granted"){
-    new Notification(title,{body});
-  }
-}
-
-// 🔹 Tambah task ke Firestore
-function addTask(){
-  const text=taskText.value.trim();
-  const time=taskTime.value;
-  if(!text||!time)return alert("Lengkapi data");
-
-  db.collection("tasks").add({
-    text,
-    time,
-    priority:taskPriority.value,
-    reminder:+taskReminder.value,
-    completed:false,
-    reminded:false,
-    alarmed:false,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  taskText.value="";
-  taskTime.value="";
-}
-
-// 🔹 Toggle status selesai
-function toggleTask(id, current){
-  db.collection("tasks").doc(id).update({
-    completed: !current
-  });
-}
-
-// 🔹 Hapus task
-function delTask(id){
-  if(confirm("Hapus tugas?")){
-    db.collection("tasks").doc(id).delete();
-  }
-}
-
-// 🔹 Render real-time dari Firestore
-db.collection("tasks").orderBy("timestamp","desc").onSnapshot(snapshot=>{
-  const list=document.getElementById("taskList");
-  list.innerHTML="";
-  const now=new Date();
-
-  snapshot.forEach(doc=>{
-    const t=doc.data();
-    const dt=new Date(t.time);
-    const div=document.createElement("div");
-    div.className="task";
-    if(t.completed)div.classList.add("completed");
-    if(dt<now&&!t.completed)div.classList.add("overdue");
-    if(dt-now<3600000&&dt>now)div.classList.add("upcoming");
-
-    div.innerHTML=`
-      <input type="checkbox" ${t.completed?"checked":""} onchange="toggleTask('${doc.id}', ${t.completed})">
-      <div>
-        <b>${t.text}</b><br>
-        ⏰ ${dt.toLocaleString()} | ${t.priority.toUpperCase()}
+    <div class="card">
+      <h3>📌 To-Do List</h3>
+      <div class="input-row">
+        <input id="taskText" placeholder="Tugas..." />
+        <input type="datetime-local" id="taskTime" />
+        <select id="taskReminder">
+          <option value="0">No Reminder</option>
+          <option value="5">5 menit</option>
+          <option value="15" selected>15 menit</option>
+          <option value="30">30 menit</option>
+        </select>
+        <button onclick="addTask()">Tambah</button>
       </div>
-      <div class="actions">
-        <button onclick="delTask('${doc.id}')">🗑️</button>
-      </div>`;
-    list.appendChild(div);
-  });
+      <div id="taskList"></div>
+    </div>
 
-  updateCountdown(snapshot.docs.map(d=>d.data()));
-});
+    <div class="card">
+      <h3>📅 Jadwal Harian</h3>
+      <div class="input-row">
+        <input id="scheduleText" placeholder="Agenda..." />
+        <input type="datetime-local" id="scheduleTime" />
+        <button onclick="addSchedule()">Tambah Jadwal</button>
+      </div>
+      <div id="scheduleList"></div>
+    </div>
+  </div>
 
-function updateCountdown(tasks){
-  const box=document.getElementById("countdown");
-  const now=new Date();
-  const upcoming=tasks
-    .filter(t=>!t.completed)
-    .map(t=>new Date(t.time))
-    .filter(d=>d>now)
-    .sort((a,b)=>a-b)[0];
-
-  if(!upcoming){box.innerHTML="";return;}
-
-  const diff=upcoming-now;
-  box.innerHTML=`⏳ Jadwal terdekat dalam ${Math.floor(diff/60000)} menit`;
-}
-
-function startAlarm(){
-  alarmTimer=setInterval(async ()=>{
-    const now=new Date();
-    const snapshot=await db.collection("tasks").get();
-    snapshot.forEach(doc=>{
-      const t=doc.data();
-      if(t.completed)return;
-      const dt=new Date(t.time);
-      const rem=new Date(dt.getTime()-t.reminder*60000);
-
-      if(!t.reminded && t.reminder>0 && now>=rem && now<dt){
-        notify("⏰ Reminder",`${t.text}`);
-        playSound();
-        db.collection("tasks").doc(doc.id).update({reminded:true});
-      }
-
-      if(!t.alarmed && now>=dt && now-dt<60000){
-        notify("🚨 Alarm",`${t.text}`);
-        playSound();
-        db.collection("tasks").doc(doc.id).update({alarmed:true});
-      }
-    });
-  },10000);
-}
-
-startAlarm();
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
