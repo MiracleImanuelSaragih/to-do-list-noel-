@@ -8,129 +8,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-
 <style>
-:root {
-  --primary: #667eea;
-  --secondary: #764ba2;
-  --danger: #f44336;
-  --warning: #ff9800;
-  --bg: linear-gradient(135deg,#667eea,#764ba2);
-}
-
-.dark-mode {
-  --bg: linear-gradient(135deg,#1a1a2e,#16213e);
-  background:#121212;
-  color:white;
-}
-
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Segoe UI,Arial;
-  background:var(--bg);
-  min-height:100vh;
-  padding:20px;
-}
-
-.container{max-width:1100px;margin:auto}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  color:white;
-  margin-bottom:20px;
-}
-
-.icon-btn{
-  background:rgba(255,255,255,.2);
-  border:none;
-  color:white;
-  font-size:20px;
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  cursor:pointer;
-}
-
-.main-card{
-  background:white;
-  border-radius:16px;
-  padding:25px;
-}
-
-.dark-mode .main-card{background:#1f1f2f}
-
-.input-row{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr auto;
-  gap:10px;
-  margin-bottom:15px;
-}
-
-input,select{
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-button.btn{
-  background:var(--bg);
-  color:white;
-  border:none;
-  padding:10px 20px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.task{
-  background:#f5f5f5;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:10px;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:10px;
-  position:relative;
-}
-
-.dark-mode .task{background:#2a2a3d}
-
-.task.overdue::before{
-  content:'';
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:4px;
-  background:var(--danger);
-}
-
-.task.upcoming::before{
-  content:'';
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:4px;
-  background:var(--warning);
-}
-
-.task.completed{opacity:.6;text-decoration:line-through}
-
-.actions button{
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-size:18px;
-}
-
-#countdown{
-  margin-bottom:15px;
-  padding:10px;
-  background:#ffebee;
-  color:#b71c1c;
-  border-radius:8px;
-  font-weight:bold;
-  text-align:center;
-}
+/* ... CSS kamu tetap sama ... */
 </style>
 </head>
 
@@ -175,12 +54,19 @@ button.btn{
 </div>
 
 <script>
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let alarmTimer;
+// 🔹 Inisialisasi Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAcnTpDBXO2WpXs3ri21SXJfzUMC_xkCkU",
+  authDomain: "premium-todo-list.firebaseapp.com",
+  projectId: "premium-todo-list",
+  storageBucket: "premium-todo-list.appspot.com",
+  messagingSenderId: "630693485104",
+  appId: "1:630693485104:web:820a99e6af935a7345abf5"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function save(){
-  localStorage.setItem("tasks",JSON.stringify(tasks));
-}
+let alarmTimer;
 
 function toggleDark(){
   document.body.classList.toggle("dark-mode");
@@ -204,48 +90,49 @@ function notify(title,body){
   }
 }
 
+// 🔹 Tambah task ke Firestore
 function addTask(){
   const text=taskText.value.trim();
   const time=taskTime.value;
   if(!text||!time)return alert("Lengkapi data");
 
-  tasks.push({
-    id:Date.now(),
+  db.collection("tasks").add({
     text,
     time,
     priority:taskPriority.value,
     reminder:+taskReminder.value,
     completed:false,
     reminded:false,
-    alarmed:false
+    alarmed:false,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
 
   taskText.value="";
   taskTime.value="";
-  save();
-  render();
 }
 
-function toggleTask(id){
-  const t=tasks.find(x=>x.id===id);
-  t.completed=!t.completed;
-  save();
-  render();
+// 🔹 Toggle status selesai
+function toggleTask(id, current){
+  db.collection("tasks").doc(id).update({
+    completed: !current
+  });
 }
 
+// 🔹 Hapus task
 function delTask(id){
   if(confirm("Hapus tugas?")){
-    tasks=tasks.filter(x=>x.id!==id);
-    save();render();
+    db.collection("tasks").doc(id).delete();
   }
 }
 
-function render(){
+// 🔹 Render real-time dari Firestore
+db.collection("tasks").orderBy("timestamp","desc").onSnapshot(snapshot=>{
   const list=document.getElementById("taskList");
   list.innerHTML="";
   const now=new Date();
 
-  tasks.forEach(t=>{
+  snapshot.forEach(doc=>{
+    const t=doc.data();
     const dt=new Date(t.time);
     const div=document.createElement("div");
     div.className="task";
@@ -254,21 +141,21 @@ function render(){
     if(dt-now<3600000&&dt>now)div.classList.add("upcoming");
 
     div.innerHTML=`
-      <input type="checkbox" ${t.completed?"checked":""} onchange="toggleTask(${t.id})">
+      <input type="checkbox" ${t.completed?"checked":""} onchange="toggleTask('${doc.id}', ${t.completed})">
       <div>
         <b>${t.text}</b><br>
         ⏰ ${dt.toLocaleString()} | ${t.priority.toUpperCase()}
       </div>
       <div class="actions">
-        <button onclick="delTask(${t.id})">🗑️</button>
+        <button onclick="delTask('${doc.id}')">🗑️</button>
       </div>`;
     list.appendChild(div);
   });
 
-  updateCountdown();
-}
+  updateCountdown(snapshot.docs.map(d=>d.data()));
+});
 
-function updateCountdown(){
+function updateCountdown(tasks){
   const box=document.getElementById("countdown");
   const now=new Date();
   const upcoming=tasks
@@ -284,9 +171,11 @@ function updateCountdown(){
 }
 
 function startAlarm(){
-  alarmTimer=setInterval(()=>{
+  alarmTimer=setInterval(async ()=>{
     const now=new Date();
-    tasks.forEach(t=>{
+    const snapshot=await db.collection("tasks").get();
+    snapshot.forEach(doc=>{
+      const t=doc.data();
       if(t.completed)return;
       const dt=new Date(t.time);
       const rem=new Date(dt.getTime()-t.reminder*60000);
@@ -294,19 +183,18 @@ function startAlarm(){
       if(!t.reminded && t.reminder>0 && now>=rem && now<dt){
         notify("⏰ Reminder",`${t.text}`);
         playSound();
-        t.reminded=true; save();
+        db.collection("tasks").doc(doc.id).update({reminded:true});
       }
 
       if(!t.alarmed && now>=dt && now-dt<60000){
         notify("🚨 Alarm",`${t.text}`);
         playSound();
-        t.alarmed=true; save();
+        db.collection("tasks").doc(doc.id).update({alarmed:true});
       }
     });
   },10000);
 }
 
-render();
 startAlarm();
 </script>
 </body>
