@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premium To-Do List - Miracle</title>
+  <title>To-Do List - Noel</title>
 
   <!-- Firebase SDK versi 8.x (non-modular) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -66,12 +66,12 @@
 </head>
 <body>
   <div class="container">
-    <h2>🚀 Premium To-Do List</h2>
+    <h2>🚀 To-Do List</h2>
 
     <div class="card">
-      <h3>📌 To-Do List</h3>
+      <h3>📌 To-Do List/ School Task</h3>
       <div class="input-row">
-        <input id="taskText" placeholder="Tugas..." />
+        <input id="taskText" placeholder="Task..." />
         <input type="datetime-local" id="taskTime" />
         <select id="taskReminder">
           <option value="0">No Reminder</option>
@@ -79,17 +79,17 @@
           <option value="15" selected>15 menit</option>
           <option value="30">30 menit</option>
         </select>
-        <button onclick="addTask()">Tambah</button>
+        <button onclick="addTask()">Add</button>
       </div>
       <div id="taskList"></div>
     </div>
 
     <div class="card">
-      <h3>📅 Jadwal Harian</h3>
+      <h3>📅 Daily Schedule</h3>
       <div class="input-row">
-        <input id="scheduleText" placeholder="Agenda..." />
+        <input id="scheduleText" placeholder="Plan..." />
         <input type="datetime-local" id="scheduleTime" />
-        <button onclick="addSchedule()">Tambah Jadwal</button>
+        <button onclick="addSchedule()">Add Schedule</button>
       </div>
       <div id="scheduleList"></div>
     </div>
